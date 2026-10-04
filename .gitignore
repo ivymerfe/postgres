@@ -48,3 +48,4 @@ lib*.pc
 /install
 .DS_Store
 .cache
+/data

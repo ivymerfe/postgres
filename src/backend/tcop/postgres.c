@@ -170,6 +170,12 @@ static bool ignore_till_sync = false;
  */
 static CachedPlanSource *unnamed_stmt_psrc = NULL;
 
+CachedPlanSource *
+GetUnnamedStatementSource(void)
+{
+	return unnamed_stmt_psrc;
+}
+
 /* assorted command-line switches */
 static const char *userDoption = NULL;	/* -D switch */
 static bool EchoQuery = false;	/* -E switch */
