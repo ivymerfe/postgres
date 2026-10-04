@@ -437,6 +437,10 @@ typedef struct xl_xact_parsed_abort
  *		extern definitions
  * ----------------
  */
+ extern void ForEachSavepoint(void (*cb)(const char *name, SubTransactionId id,
+                                        int level, void *arg),
+                             void *arg);
+
 extern bool IsTransactionState(void);
 extern bool IsAbortedTransactionBlockState(void);
 extern TransactionId GetTopTransactionId(void);

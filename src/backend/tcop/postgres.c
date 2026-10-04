@@ -87,6 +87,12 @@
 #include "utils/timestamp.h"
 #include "utils/varlena.h"
 
+exec_simple_query_hook_type exec_simple_query_hook = NULL;
+exec_parse_message_hook_type exec_parse_message_hook = NULL;
+exec_bind_message_hook_type exec_bind_message_hook = NULL;
+exec_execute_message_hook_type exec_execute_message_hook = NULL;
+pq_msg_sync_hook_type pq_msg_sync_hook = NULL;
+
 /* ----------------
  *		global variables
  * ----------------
@@ -1038,6 +1044,10 @@ exec_simple_query(const char *query_string)
 	bool		use_implicit_block;
 	char		msec_str[32];
 
+	if (exec_simple_query_hook != NULL) {
+		exec_simple_query_hook(query_string);
+	}
+
 	/*
 	 * Report query to various monitoring facilities.
 	 */
@@ -1432,6 +1442,10 @@ exec_parse_message(const char *query_string,	/* string to execute */
 	bool		is_named;
 	bool		save_log_statement_stats = log_statement_stats;
 	char		msec_str[32];
+
+	if (exec_parse_message_hook != NULL) {
+		exec_parse_message_hook(query_string, stmt_name, paramTypes, numParams);
+	}
 
 	/*
 	 * Report query to various monitoring facilities.
@@ -2046,6 +2060,11 @@ exec_bind_message(StringInfo input_message)
 
 	pq_getmsgend(input_message);
 
+	if (exec_bind_message_hook != NULL) {
+		exec_bind_message_hook(portal_name, stmt_name, numPFormats, pformats,
+								numRFormats, rformats, numParams, params);
+	}
+
 	/*
 	 * Obtain a plan from the CachedPlanSource.  Any cruft from (re)planning
 	 * will be generated in MessageContext.  The plan refcount will be
@@ -2168,6 +2187,10 @@ exec_execute_message(const char *portal_name, long max_rows)
 	const char *cmdtagname;
 	size_t		cmdtaglen;
 	ListCell   *lc;
+
+	if (exec_execute_message_hook != NULL) {
+		exec_execute_message_hook(portal_name, max_rows);
+	}
 
 	/* Adjust destination to tell printtup.c what to do */
 	dest = whereToSendOutput;
@@ -5139,6 +5162,10 @@ PostgresMain(const char *dbname, const char *username)
 
 			case PqMsg_Sync:
 				pq_getmsgend(&input_message);
+
+				if (pq_msg_sync_hook != NULL) {
+					pq_msg_sync_hook();
+				}
 
 				/*
 				 * If pipelining was used, we may be in an implicit

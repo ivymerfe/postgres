@@ -43,3 +43,8 @@ lib*.pc
 /Release/
 /tmp_install/
 /portlock/
+
+/build
+/install
+.DS_Store
+.cache

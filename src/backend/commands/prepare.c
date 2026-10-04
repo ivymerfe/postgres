@@ -54,6 +54,20 @@ static ParamListInfo EvaluateParams(ParseState *pstate,
 									EState *estate);
 static Datum build_regtype_array(Oid *param_types, int num_params);
 
+void
+ForEachPreparedStatement(void (*cb)(PreparedStatement *, void *), void *arg)
+{
+	HASH_SEQ_STATUS seq;
+	PreparedStatement *ps;
+
+	if (!prepared_queries)
+		return;
+
+	hash_seq_init(&seq, prepared_queries);
+	while ((ps = hash_seq_search(&seq)) != NULL)
+		cb(ps, arg);
+}
+
 /*
  * Implements the 'PREPARE' utility statement.
  */

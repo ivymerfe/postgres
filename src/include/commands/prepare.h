@@ -34,6 +34,7 @@ typedef struct
 	TimestampTz prepare_time;	/* the time when the stmt was prepared */
 } PreparedStatement;
 
+extern void ForEachPreparedStatement(void (*cb)(PreparedStatement *, void *), void *arg);
 
 /* Utility statements PREPARE, EXECUTE, DEALLOCATE, EXPLAIN EXECUTE */
 extern void PrepareQuery(ParseState *pstate, PrepareStmt *stmt,

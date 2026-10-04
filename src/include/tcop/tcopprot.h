@@ -19,6 +19,35 @@
 #include "storage/procsignal.h"
 #include "utils/guc.h"
 #include "utils/queryenvironment.h"
+#include "utils/plancache.h"
+
+typedef void (*exec_simple_query_hook_type)(const char *query_string);
+extern PGDLLIMPORT exec_simple_query_hook_type exec_simple_query_hook;
+
+typedef void (*exec_parse_message_hook_type)(
+    const char *query_string, /* string to execute */
+    const char *stmt_name,    /* name for prepared stmt */
+    Oid *paramTypes,          /* parameter types */
+    int numParams);
+extern PGDLLIMPORT exec_parse_message_hook_type exec_parse_message_hook;
+
+typedef void (*exec_bind_message_hook_type)(const char *portal_name,
+                                            const char *stmt_name,
+                                            int numPFormats, int16 *pformats,
+                                            int numRFormats, int16 *rformats,
+                                            int numParams,
+                                            ParamListInfo params);
+extern PGDLLIMPORT exec_bind_message_hook_type exec_bind_message_hook;
+
+typedef void (*exec_execute_message_hook_type)(const char *portal_name,
+                                               long max_rows);
+extern PGDLLIMPORT exec_execute_message_hook_type exec_execute_message_hook;
+
+typedef void (*pq_msg_sync_hook_type)();
+extern PGDLLIMPORT pq_msg_sync_hook_type pq_msg_sync_hook;
+
+extern CachedPlanSource *GetUnnamedStatementSource(void);
+
 
 typedef struct ExplainState ExplainState;	/* defined in explain_state.h */
 

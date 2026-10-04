@@ -375,6 +375,26 @@ static const char *BlockStateAsString(TBlockState blockState);
 static const char *TransStateAsString(TransState state);
 
 
+static void
+walk_savepoints(TransactionState s,
+				void (*cb)(const char *, SubTransactionId, int, void *),
+				void *arg)
+{
+	if (s->parent == NULL)
+		return;
+	walk_savepoints(s->parent, cb, arg);
+	cb(s->name, s->subTransactionId, s->nestingLevel, arg);
+}
+
+void
+ForEachSavepoint(void (*cb)(const char *, SubTransactionId, int, void *),
+				 void *arg)
+{
+	walk_savepoints(CurrentTransactionState, cb, arg);
+}
+
+
+
 /* ----------------------------------------------------------------
  *	transaction state accessors
  * ----------------------------------------------------------------
