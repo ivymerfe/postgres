@@ -1050,10 +1050,6 @@ exec_simple_query(const char *query_string)
 	bool		use_implicit_block;
 	char		msec_str[32];
 
-	if (exec_simple_query_hook != NULL) {
-		exec_simple_query_hook(query_string);
-	}
-
 	/*
 	 * Report query to various monitoring facilities.
 	 */
@@ -1078,6 +1074,10 @@ exec_simple_query(const char *query_string)
 	 * will normally change current memory context.)
 	 */
 	start_xact_command();
+
+	if (exec_simple_query_hook != NULL) {
+		exec_simple_query_hook(query_string);
+	}
 
 	/*
 	 * Zap any pre-existing unnamed statement.  (While not strictly necessary,
@@ -1449,10 +1449,6 @@ exec_parse_message(const char *query_string,	/* string to execute */
 	bool		save_log_statement_stats = log_statement_stats;
 	char		msec_str[32];
 
-	if (exec_parse_message_hook != NULL) {
-		exec_parse_message_hook(query_string, stmt_name, paramTypes, numParams);
-	}
-
 	/*
 	 * Report query to various monitoring facilities.
 	 */
@@ -1477,6 +1473,10 @@ exec_parse_message(const char *query_string,	/* string to execute */
 	 * necessary.
 	 */
 	start_xact_command();
+
+	if (exec_parse_message_hook != NULL) {
+		exec_parse_message_hook(query_string, stmt_name, paramTypes, numParams);
+	}
 
 	/*
 	 * Switch to appropriate context for constructing parsetrees.
@@ -2194,10 +2194,6 @@ exec_execute_message(const char *portal_name, long max_rows)
 	size_t		cmdtaglen;
 	ListCell   *lc;
 
-	if (exec_execute_message_hook != NULL) {
-		exec_execute_message_hook(portal_name, max_rows);
-	}
-
 	/* Adjust destination to tell printtup.c what to do */
 	dest = whereToSendOutput;
 	if (dest == DestRemote)
@@ -2287,6 +2283,10 @@ exec_execute_message(const char *portal_name, long max_rows)
 	 * case already due to prior BIND).
 	 */
 	start_xact_command();
+
+	if (exec_execute_message_hook != NULL) {
+		exec_execute_message_hook(portal_name, max_rows);
+	}
 
 	/*
 	 * If we re-issue an Execute protocol request against an existing portal,
