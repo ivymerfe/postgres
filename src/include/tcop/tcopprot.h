@@ -43,8 +43,12 @@ typedef void (*exec_execute_message_hook_type)(const char *portal_name,
                                                long max_rows);
 extern PGDLLIMPORT exec_execute_message_hook_type exec_execute_message_hook;
 
-typedef void (*pq_msg_sync_hook_type)();
+typedef void (*pq_msg_sync_hook_type)(void);
 extern PGDLLIMPORT pq_msg_sync_hook_type pq_msg_sync_hook;
+
+typedef void (*pq_msg_close_hook_type)(int close_type,
+                                       const char *close_target);
+extern PGDLLIMPORT pq_msg_close_hook_type pq_msg_close_hook;
 
 extern CachedPlanSource *GetUnnamedStatementSource(void);
 

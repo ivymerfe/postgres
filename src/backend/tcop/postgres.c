@@ -92,6 +92,7 @@ exec_parse_message_hook_type exec_parse_message_hook = NULL;
 exec_bind_message_hook_type exec_bind_message_hook = NULL;
 exec_execute_message_hook_type exec_execute_message_hook = NULL;
 pq_msg_sync_hook_type pq_msg_sync_hook = NULL;
+pq_msg_close_hook_type pq_msg_close_hook = NULL;
 
 /* ----------------
  *		global variables
@@ -5090,6 +5091,10 @@ PostgresMain(const char *dbname, const char *username)
 					close_type = pq_getmsgbyte(&input_message);
 					close_target = pq_getmsgstring(&input_message);
 					pq_getmsgend(&input_message);
+
+					if (pq_msg_close_hook != NULL) {
+						pq_msg_close_hook(close_type, close_target);
+					}
 
 					switch (close_type)
 					{
